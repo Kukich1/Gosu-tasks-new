@@ -76,7 +76,7 @@ export default {
                     'Authorization': `Bearer ${cleanToken}`
                 },
             };
-            const response = await axios.get('https://gosutasks-api.vercel.app/admin/get_data', config)
+            const response = await axios.get('https://gosutasks-api.vercel.app/admin/get_users_list', config)
             const username = response.data.map(obj => obj.username)
             this.username = username
             this.value = this.username

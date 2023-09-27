@@ -15,7 +15,7 @@
                 </v-container>
 
                 <v-container v-if="selectedContainer === 'company'">
-                    <company-container :tab="tab" @update:tab="tab = $event" :projects="projects" :archive="archive" :dateRange="dateRange"></company-container>
+                    <company-container :projects="projects" :archive="archive" :dateRange="dateRange" @updateTab="tab = $event"></company-container>
                 </v-container>
 
                 <v-container v-if="this.selectedContainer === 'account'">
@@ -54,9 +54,6 @@
 <script>
 import axios from 'axios';
 import AddNewProject from '@/components/AddNewProject.vue';
-import Datepicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
-import { ru } from 'date-fns/locale';
 import MyDrawer from '@/components/MyDrawer.vue';
 import MyAppBar from '@/components/MyAppBar.vue';
 import CompanyContainer from '@/components/CompanyContainer.vue'
@@ -64,7 +61,6 @@ import CompanyContainer from '@/components/CompanyContainer.vue'
 export default {
     components: {
         AddNewProject,
-        Datepicker,
         MyDrawer,
         MyAppBar,
         CompanyContainer,
@@ -87,7 +83,7 @@ export default {
         return {
             Name: clearName,
             Role: Role,
-            tab: null,
+            tab: 'current',
             drawer: true,
             rail: false,
             selectedContainer: "loading",
@@ -100,7 +96,6 @@ export default {
             dateFormatted: dateFormatted,
             menu1: false,
             menu2: false,
-            computedDateFormatted: null,
         };
     },
     computed: {
@@ -120,6 +115,10 @@ export default {
         }
     },
     methods: {
+        updateTab(newTab) {
+            // Обновите значение tab, когда событие emit происходит внутри CompanyContainer.vue
+            this.tab = newTab;
+        },
         calculateDateRange() {
             const today = new Date();
             const sevenDaysAgo = new Date(today);
