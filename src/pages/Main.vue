@@ -5,7 +5,7 @@
             <my-drawer :drawer="drawer" :rail="rail" :Name="Name" :dataFromServer="dataFromServer"
                 :showContainer="showContainer" :logout="logout"></my-drawer>
 
-            <my-app-bar :Role="Role" :dataFromServer="dataFromServer"></my-app-bar>
+            <my-app-bar :Role="parseInt(Role)" :dataFromServer="dataFromServer" :projectShow="projectShow"></my-app-bar>
 
             <v-main style="height: 100vh">
 
@@ -15,7 +15,9 @@
                 </v-container>
 
                 <v-container v-if="selectedContainer === 'company'">
-                    <company-container :projects="projects" :archive="archive" :dateRange="dateRange" @updateTab="tab = $event"></company-container>
+                    <company-container :projectShow="projectShow" :projects="projects" :archive="archive"
+                        :dateRange="dateRange" @updateTab="tab = $event" @update:dateRange="dateRange = $event"
+                        @open-modal="openProjectModal"></company-container>
                 </v-container>
 
                 <v-container v-if="this.selectedContainer === 'account'">
@@ -53,14 +55,15 @@
 
 <script>
 import axios from 'axios';
-import AddNewProject from '@/components/AddNewProject.vue';
+import ProjectCreate from '@/components/ProjectCreate.vue';
 import MyDrawer from '@/components/MyDrawer.vue';
 import MyAppBar from '@/components/MyAppBar.vue';
 import CompanyContainer from '@/components/CompanyContainer.vue'
+import timestamp from '@/utils/timestamp';
 
 export default {
     components: {
-        AddNewProject,
+        ProjectCreate,
         MyDrawer,
         MyAppBar,
         CompanyContainer,
@@ -87,15 +90,14 @@ export default {
             drawer: true,
             rail: false,
             selectedContainer: "loading",
-            dataFromServer: [],
+            dataFromServer: null,
             projects: [],
             dateRange: this.calculateDateRange(),
             archive: [],
             type: null,
             date: date,
             dateFormatted: dateFormatted,
-            menu1: false,
-            menu2: false,
+            selectedProject: null,
         };
     },
     computed: {
@@ -105,7 +107,7 @@ export default {
     },
     watch: {
         async dateRange(vals) {
-            this.getArchive();
+            this.getArchive(timestamp(vals[0]), timestamp(vals[1])); // [0, 20000], timestamp types
         },
         async dataFromServer(vals) {
             console.log(vals);
@@ -115,8 +117,16 @@ export default {
         }
     },
     methods: {
+        showContainer(value) {
+            this.selectedContainer = value;
+        },
+        openProjectModal(projectData) {
+            this.selectedProject = projectData;
+        },
+        closeProjectModal() {
+            this.selectedProject = null;
+        },
         updateTab(newTab) {
-            // Обновите значение tab, когда событие emit происходит внутри CompanyContainer.vue
             this.tab = newTab;
         },
         calculateDateRange() {
@@ -137,22 +147,45 @@ export default {
                 console.log('Projects array is empty or undefined.');
                 return [];
             }
+            const currentTime = Math.floor(Date.now() / 1000);
             return this.dataFromServer.map(project => {
-                const currentTime = Math.floor(Date.now() / 1000);
                 const timeUntilDeadline = project.deadline - currentTime;
                 const days = Math.floor(timeUntilDeadline / 86400);
                 const hours = Math.floor((timeUntilDeadline % 86400) / 3600);
                 const minutes = Math.floor(((timeUntilDeadline % 86400) % 3600) / 60);
+
+                let urgency = 3; // По умолчанию 3 для всех остальных проектов
+
+                if (timeUntilDeadline < 604800 && timeUntilDeadline > 0) {
+                    // Если осталось менее недели
+                    urgency = 2;
+                } else if (timeUntilDeadline < 0) {
+                    // Если дедлайн просрочен
+                    urgency = 1;
+                }
+
                 return {
                     project,
                     timeUntilDeadline,
                     remainingDays: Math.abs(days),
                     remainingHours: Math.abs(hours),
-                    remainingMinutes: Math.abs(minutes)
-                };
+                    remainingMinutes: Math.abs(minutes),
+                    urgency,
+                }
+            }).sort((a, b) => {
+                // Сортировка по уровню срочности и времени до дедлайна
+                if (a.urgency !== b.urgency) {
+                    return a.urgency - b.urgency;
+                }
+                if (a.urgency === 1) {
+                    return -1;
+                } else if (b.urgency === 1) {
+                    return 1;
+                }
+                return a.timeUntilDeadline - b.timeUntilDeadline;
             });
         },
-        getConfig() {
+        getToken() {
             const token = localStorage.getItem("token");
             const cleanToken = token.replaceAll("\"", "");
             return {
@@ -161,25 +194,50 @@ export default {
                 },
             };
         },
+        getRefreshToken() {
+            const refresh_token = localStorage.getItem("refresh_token");
+            const clearRef = refresh_token.replaceAll("\"", "");
+            let config2 = {
+                headers: {
+                    'Authorization': `Bearer ${clearRef}`
+                },
+            };
+        },
         async projectShow() {
             try {
-                const response = await axios.get('https://gosutasks-api.vercel.app/company/projects/', this.getConfig());
+                const response = await axios.get('https://gosutasks-api.vercel.app/company/projects/', this.getToken());
                 this.dataFromServer = response.data;
-                this.projects = dataFromServer.filter(item => item.status === 'current');
+                console.log(this.$store.state.projects)
+                this.$store.commit("SET_PROJECTS", this.remainingTime());
+                console.log(this.$store.state.projects)
             }
             catch {
+                // const response1 = await axios.post('https://gosutasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
+                // localStorage.removeItem("token")
+                // localStorage.setItem("token", JSON.stringify(response1.data.access_token));
+
+                // const response = await axios.get('https://gosutasks-api.vercel.app/company/projects/', this.catchGetToken());
+                // this.dataFromServer = response.data;
+                // this.projects = dataFromServer.filter(item => item.status === 'current');
             }
         },
-        async getArchive() {
+        async getArchive(start, end) {
             try {
-                const response = await axios.get('https://gosutasks-api.vercel.app/company/completed_projects', this.getConfig());
+                this.selectedContainer = "loading"
+                const response = await axios.get(`https://gosutasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
                 this.archive = response.data.filter(item => item.status === 'completed');
             } catch {
+                const response1 = await axios.post('https://gosutasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
+                localStorage.removeItem("token")
+                localStorage.setItem("token", JSON.stringify(response1.data.access_token));
 
+                this.selectedContainer = "loading"
+                const response = await axios.get(`https://gosutasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
+                this.archive = response.data.filter(item => item.status === 'completed');
+            } finally {
+                this.selectedContainer = "company"
+                this.tab = "completed"
             }
-        },
-        showContainer(value) {
-            this.selectedContainer = value;
         },
         logout() {
             localStorage.removeItem('token');
@@ -197,7 +255,7 @@ export default {
         setInterval(() => {
             this.projects = this.remainingTime();
         }, 60000);
-        this.getArchive();
+        this.getArchive(timestamp(this.dateRange[0]), timestamp(this.dateRange[1]));
     },
 }
 </script>
@@ -207,4 +265,4 @@ export default {
     overflow-y: auto;
     max-height: 100%;
 }
-</style>
+</style>    

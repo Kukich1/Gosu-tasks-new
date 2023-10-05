@@ -13,16 +13,16 @@
             <v-list density="compact" nav>
 
                 <v-list-item prepend-icon="mdi-home-city" title="Компания" value="company"
-                    v-bind:disabled="!this.dataFromServer.length" @click="showContainer('company')"></v-list-item>
+                    v-bind:disabled="!this.dataFromServer" @click="showContainer('company')"></v-list-item>
 
                 <v-list-item prepend-icon="mdi-account" title="Личные задачи" value="account"
-                    v-bind:disabled="!this.dataFromServer.length" @click="showContainer('account')"></v-list-item>
+                    v-bind:disabled="!this.dataFromServer" @click="showContainer('account')"></v-list-item>
 
             </v-list>
 
             <template v-slot:append>
                 <div class="pa-2">
-                    <v-list-item block title="Log Out" prepend-icon="mdi-logout" density="compact" @click="logout"
+                    <v-list-item color="red" block title="Log Out" prepend-icon="mdi-logout" density="compact" @click="logout"
                         nav></v-list-item>
                 </div>
             </template>
