@@ -4,13 +4,13 @@
     </div> -->
     <v-container>
         <v-card>
-            <v-tabs align-tabs="title" grow v-model="tab">
+            <v-tabs align-tabs="title" grow @update:model-value="this.$emit('update:tab', $event)" :model-value="tab">
                 <v-tab value="current">Проекты</v-tab>
                 <v-tab value="completed">Архив</v-tab>
             </v-tabs>
 
             <v-card-text style="height: calc(100vh - 176px); overflow-y: scroll;">
-                <v-window v-model="tab">
+                <v-window :model-value="tab" v-on:update:model-value="this.$emit('update:tab', $event)">
                     <v-window-item value="current">
                         <v-row>
                             <v-col v-for="projectData in this.$store.state.projects" :key="projectData.project?.id" cols="4"
@@ -27,27 +27,27 @@
                                         {{projectData.remainingHours }} часов и {{ projectData.remainingMinutes}}
                                         минут назад</template>
                                 </v-card>
-                                <ProjectDialog :projectShow="projectShow" @update:dialog="projectData.dialog = $event"
+                                <ProjectDialog :Role="Role" :projectShow="projectShow" @update:dialog="projectData.dialog = $event"
                                     :dialog="projectData.dialog" :projectData="projectData" ref="projectDialog">
                                 </ProjectDialog>
                             </v-col>
                         </v-row>
                     </v-window-item>
                     <v-window-item value="completed" style="height: 500px;" class="scrollable-container">
-                        <v-row >
-                            <Datepicker :model-value="this.dateRange"
-                                @update:model-value="this.$emit('update:dateRange', $event)" range :maxDate="new Date()"
-                                :enableTimePicker="false" locale="ru" select-text="Выбрать" cancel-text="Отменить"
-                                :startTime="[{ hours: 0, minutes: 0 }, { hours: 23, minutes: 59 }]" :clearable="false" class="custom-datepicker"/>
+                        <v-row>
+                            <v-col cols="12">
+                                <Datepicker :model-value="this.dateRange"
+                                    @update:model-value="this.$emit('update:dateRange', $event)" range :maxDate="new Date()"
+                                    :enableTimePicker="false" locale="ru" select-text="Выбрать" cancel-text="Отменить"
+                                    :startTime="[{ hours: 0, minutes: 0 }, { hours: 23, minutes: 59 }]" :clearable="false"
+                                    class="custom-datepicker" style="width: 100%;"/>
+                            </v-col>
                             <v-col block class="ma-2" v-if="archive.length > 0" v-for="item in archive" cols="4">
                                 <v-card block class="ma-2 pa-2" @click="" color="green-accent-3" rounded-lg>
                                     <v-card-title :key="item?.id">{{ item?.name }}</v-card-title>
                                     <v-card-text>{{ item?.description }}</v-card-text>
                                 </v-card>
                             </v-col>
-                            <div v-else>
-                                <p class="text-h6">Этот временной отрезок пуст</p>
-                            </div>
                         </v-row>
                     </v-window-item>
                 </v-window>
@@ -68,9 +68,11 @@ export default {
         console.log("this.projects", this.projects);
     },
     props: {
+        Role: Number,
         archive: Array,
         dateRange: Array,
         projectShow: Function,
+        tab: String,
     },
     components: {
         Datepicker,
@@ -79,7 +81,6 @@ export default {
     data() {
         return {
             projects: [],
-            tab: null,
             showProjectDialog: false,
             selectedProjectData: null,
         };
@@ -136,6 +137,7 @@ export default {
 .yellow-card {
     background-color: yellow;
 }
+
 .custom-datepicker {
     width: 50vh
 }

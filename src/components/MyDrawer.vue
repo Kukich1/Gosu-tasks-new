@@ -22,8 +22,8 @@
 
             <template v-slot:append>
                 <div class="pa-2">
-                    <v-list-item color="red" block title="Log Out" prepend-icon="mdi-logout" density="compact" @click="logout"
-                        nav></v-list-item>
+                    <v-list-item color="red" block title="Log Out" prepend-icon="mdi-logout" density="compact"
+                        @click="logout" nav></v-list-item>
                 </div>
             </template>
 
@@ -41,7 +41,12 @@ export default {
         showContainer: Function,
         logout: Function,
     },
-}
+    methods: {
+        showContainer(tabMyDrawer) {
+            this.$store.commit("SET_SELECTED_PAGE", tabMyDrawer);
+        },
+    }
+}   
 </script>
 
 <style lang="scss" scoped></style>

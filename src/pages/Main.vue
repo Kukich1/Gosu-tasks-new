@@ -9,36 +9,41 @@
 
             <v-main style="height: 100vh">
 
-                <v-container v-model="tab" v-if="this.selectedContainer === 'loading'"
+                <v-container v-model="tab" v-if="this.$store.state.selectedPage === 'loading'"
                     style="display: flex; justify-content: center; align-items: center; height: 100%;">
                     <v-progress-circular indeterminate color="#65b2f0"></v-progress-circular>
                 </v-container>
 
-                <v-container v-if="selectedContainer === 'company'">
-                    <company-container :projectShow="projectShow" :projects="projects" :archive="archive"
-                        :dateRange="dateRange" @updateTab="tab = $event" @update:dateRange="dateRange = $event"
+                <v-container v-if="this.$store.state.selectedPage === 'company'">
+                    <company-container :Role="parseInt(Role)" :projectShow="projectShow" :projects="projects" :archive="archive" :tab="tab"
+                        @update:tab="tab = $event" :dateRange="dateRange" @update:dateRange="dateRange = $event"
                         @open-modal="openProjectModal"></company-container>
                 </v-container>
 
-                <v-container v-if="this.selectedContainer === 'account'">
+                <v-container v-if="this.$store.state.selectedPage === 'account'">
                     <v-row>
                         <v-col cols="12">
                             <v-card>
                                 <v-tabs v-model="tab" align-tabs="title" grow>
-                                    <v-tab>Все задание</v-tab>
-                                    <v-tab>Все задачи</v-tab>
-                                    <v-tab>Выполненные задание</v-tab>
+                                    <v-tab value="incoming">Все задание</v-tab>
+                                    <v-tab value="current">Все задачи</v-tab>
+                                    <v-tab value="completed">Выполненные задание</v-tab>
                                 </v-tabs>
 
                                 <v-card-text>
                                     <v-window v-model="tab">
-                                        <v-window-item value="projects">
-                                            <v-card flat>
+                                        <v-window-item value="incoming">
+                                            <v-card>
                                                 <v-card-text></v-card-text>
                                             </v-card>
                                         </v-window-item>
-                                        <v-window-item value="archive">
-                                            <v-card flat>
+                                        <v-window-item value="current">
+                                            <v-card>
+                                                <v-card-text></v-card-text>
+                                            </v-card>
+                                        </v-window-item>
+                                        <v-window-item value="completed">
+                                            <v-card>
                                                 <v-card-text></v-card-text>
                                             </v-card>
                                         </v-window-item>
@@ -89,7 +94,6 @@ export default {
             tab: 'current',
             drawer: true,
             rail: false,
-            selectedContainer: "loading",
             dataFromServer: null,
             projects: [],
             dateRange: this.calculateDateRange(),
@@ -117,9 +121,6 @@ export default {
         }
     },
     methods: {
-        showContainer(value) {
-            this.selectedContainer = value;
-        },
         openProjectModal(projectData) {
             this.selectedProject = projectData;
         },
@@ -208,6 +209,7 @@ export default {
                 const response = await axios.get('https://gosutasks-api.vercel.app/company/projects/', this.getToken());
                 this.dataFromServer = response.data;
                 console.log(this.$store.state.projects)
+                this.projects = this.dataFromServer.filter(item => item.status === 'current');
                 this.$store.commit("SET_PROJECTS", this.remainingTime());
                 console.log(this.$store.state.projects)
             }
@@ -222,21 +224,21 @@ export default {
             }
         },
         async getArchive(start, end) {
+            const preCommitPage = this.$store.state.selectedPage;
             try {
-                this.selectedContainer = "loading"
+                this.$store.commit("SET_SELECTED_PAGE", "loading")
                 const response = await axios.get(`https://gosutasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
                 this.archive = response.data.filter(item => item.status === 'completed');
-            } catch {
-                const response1 = await axios.post('https://gosutasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
-                localStorage.removeItem("token")
-                localStorage.setItem("token", JSON.stringify(response1.data.access_token));
-
-                this.selectedContainer = "loading"
-                const response = await axios.get(`https://gosutasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
-                this.archive = response.data.filter(item => item.status === 'completed');
+            } catch (error) {
+                // console.error('Ошибка обновления токена:', error);
+                // const response1 = await axios.post('https://gosutasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
+                // localStorage.removeItem("token")
+                // localStorage.setItem("token", JSON.stringify(response1.data.access_token));
+                // this.$store.commit("SET_SELECTED_PAGE", "loading")
+                // const response = await axios.get(`https://gosutasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
+                // this.archive = response.data.filter(item => item.status === 'completed');
             } finally {
-                this.selectedContainer = "company"
-                this.tab = "completed"
+                this.$store.commit("SET_SELECTED_PAGE", preCommitPage)
             }
         },
         logout() {
@@ -250,7 +252,7 @@ export default {
     },
     async mounted() {
         await this.projectShow();
-        this.selectedContainer = 'company';
+        this.$store.commit("SET_SELECTED_PAGE", "company")
         this.projects = this.remainingTime();
         setInterval(() => {
             this.projects = this.remainingTime();
