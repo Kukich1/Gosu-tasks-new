@@ -5,8 +5,8 @@
             <div v-if="Role === 1 && this.$store.state.selectedPage === 'company'" >
                 <ProjectCreate :disabled="!this.dataFromServer" :projectShow="this.projectShow" />
             </div>
-            <div v-else-if="Role === 1 && this.$store.state.selectedPage === 'account'" >
-                <TaskCreate :disable="!this.dataFromServer" :taskShow="this.projectTasksShow"/>
+            <div v-else-if="Role === 1 && this.$store.state.selectedPage === 'tasks'" >
+                <TaskCreate :disable="!this.dataFromServer" :projectShow="this.projectShow"/>
             </div> 
         </v-app-bar>
     </div>
@@ -25,6 +25,7 @@ export default {
     },
     props: {
         Role: Number,
+        editDialog: Boolean,
         dataFromServer: Array,
         projectShow: Function,
     },

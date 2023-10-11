@@ -9,7 +9,7 @@
                 </template>
                 <v-card>
                     <v-card-title>
-                        <span class="text-h5">Добавить новый проект</span>
+                        <span class="text-h5 pl-8">Добавить новый проект</span>
                     </v-card-title>
                     <v-card-text>
                         <v-container>
@@ -35,11 +35,11 @@
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
+                        <v-btn color="blue-darken-1" variant="text" @click="closeCreateAndEditProject">
                             Закрыть
                         </v-btn>
                         <v-btn color="blue-darken-1" variant="text" @click="createProject">
-                            Сохранить
+                            Создать
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -73,6 +73,9 @@ export default {
         }
     },
     methods: {
+        closeCreateAndEditProject() {
+            this.dialog = false;
+        },
         updateMembers(selectedMembers) {
             this.project.members = selectedMembers;
         },
@@ -102,12 +105,11 @@ export default {
             } else if (response.status !== 200) {
                 alert('Ошибка')
             }
+
         },
     },
     watch: {
         'project.deadline': function (newVal, oldVal) {
-            console.log("newVal", newVal);
-            console.log("oldVal", oldVal);
             if (typeof newVal === 'number') { return; }
             if (newVal?.split('-')[0]?.length > 4) { this.project.deadline = oldVal; return; }
         }
@@ -118,4 +120,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped></style> 

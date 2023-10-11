@@ -2,10 +2,11 @@
     <v-card>
         <v-layout>
 
-            <my-drawer :drawer="drawer" :rail="rail" :Name="Name" :dataFromServer="dataFromServer"
+            <my-drawer :Role="parseInt(Role)" :drawer="drawer" :rail="rail" :Name="Name" :dataFromServer="dataFromServer"
                 :showContainer="showContainer" :logout="logout"></my-drawer>
 
-            <my-app-bar :Role="parseInt(Role)" :dataFromServer="dataFromServer" :projectShow="projectShow"></my-app-bar>
+            <my-app-bar :Role="parseInt(Role)" :dataFromServer="dataFromServer" :projectShow="projectShow"
+                :editDialog="editDialog"></my-app-bar>
 
             <v-main style="height: 100vh">
 
@@ -15,44 +16,16 @@
                 </v-container>
 
                 <v-container v-if="this.$store.state.selectedPage === 'company'">
-                    <company-container :Role="parseInt(Role)" :projectShow="projectShow" :projects="projects" :archive="archive" :tab="tab"
-                        @update:tab="tab = $event" :dateRange="dateRange" @update:dateRange="dateRange = $event"
-                        @open-modal="openProjectModal"></company-container>
+                    <ContainerCompany :Role="parseInt(Role)" :projectShow="projectShow" :projects="projects"
+                        :archive="archive" :tab="tab" :dateRange="dateRange" @update:dateRange="dateRange = $event"
+                        @update:tab="tab = $event" @open-modal="openProjectModal" @edit:dialog="EditShow">
+                    </ContainerCompany>
                 </v-container>
 
-                <v-container v-if="this.$store.state.selectedPage === 'account'">
-                    <v-row>
-                        <v-col cols="12">
-                            <v-card>
-                                <v-tabs v-model="tab" align-tabs="title" grow>
-                                    <v-tab value="incoming">Все задание</v-tab>
-                                    <v-tab value="current">Все задачи</v-tab>
-                                    <v-tab value="completed">Выполненные задание</v-tab>
-                                </v-tabs>
-
-                                <v-card-text>
-                                    <v-window v-model="tab">
-                                        <v-window-item value="incoming">
-                                            <v-card>
-                                                <v-card-text></v-card-text>
-                                            </v-card>
-                                        </v-window-item>
-                                        <v-window-item value="current">
-                                            <v-card>
-                                                <v-card-text></v-card-text>
-                                            </v-card>
-                                        </v-window-item>
-                                        <v-window-item value="completed">
-                                            <v-card>
-                                                <v-card-text></v-card-text>
-                                            </v-card>
-                                        </v-window-item>
-                                    </v-window>
-                                </v-card-text>
-                            </v-card>
-                        </v-col>
-                    </v-row>
+                <v-container v-if="this.$store.state.selectedPage === 'tasks'">
+                    <ContainerTasks :Role="parseInt(Role)"></ContainerTasks>
                 </v-container>
+
             </v-main>
         </v-layout>
     </v-card>
@@ -63,7 +36,8 @@ import axios from 'axios';
 import ProjectCreate from '@/components/ProjectCreate.vue';
 import MyDrawer from '@/components/MyDrawer.vue';
 import MyAppBar from '@/components/MyAppBar.vue';
-import CompanyContainer from '@/components/CompanyContainer.vue'
+import ContainerCompany from '@/components/ContainerCompany.vue'
+import ContainerTasks from '@/components/ContainerTasks.vue'
 import timestamp from '@/utils/timestamp';
 
 export default {
@@ -71,7 +45,8 @@ export default {
         ProjectCreate,
         MyDrawer,
         MyAppBar,
-        CompanyContainer,
+        ContainerCompany,
+        ContainerTasks,
     },
     data() {
         const Name = localStorage.getItem('name');
@@ -96,12 +71,14 @@ export default {
             rail: false,
             dataFromServer: null,
             projects: [],
+            projectname: [],
             dateRange: this.calculateDateRange(),
             archive: [],
             type: null,
             date: date,
             dateFormatted: dateFormatted,
             selectedProject: null,
+            editDialog: false,
         };
     },
     computed: {
@@ -114,13 +91,15 @@ export default {
             this.getArchive(timestamp(vals[0]), timestamp(vals[1])); // [0, 20000], timestamp types
         },
         async dataFromServer(vals) {
-            console.log(vals);
         },
         async isModalOpen(vals) {
             this.projectShow();
         }
     },
     methods: {
+        EditShow(newValue) {
+            this.editDialog = newValue;
+        },
         openProjectModal(projectData) {
             this.selectedProject = projectData;
         },
@@ -143,7 +122,7 @@ export default {
 
             return [startOfDay, endOfDay];
         },
-        remainingTime() {
+        projectRemainingTime() {
             if (!this.dataFromServer || this.dataFromServer.length === 0) {
                 console.log('Projects array is empty or undefined.');
                 return [];
@@ -208,12 +187,14 @@ export default {
             try {
                 const response = await axios.get('https://gosutasks-api.vercel.app/company/projects/', this.getToken());
                 this.dataFromServer = response.data;
-                console.log(this.$store.state.projects)
                 this.projects = this.dataFromServer.filter(item => item.status === 'current');
-                this.$store.commit("SET_PROJECTS", this.remainingTime());
-                console.log(this.$store.state.projects)
+                this.$store.commit("SET_PROJECTS", this.projectRemainingTime());
+                const projectname = response.data.map(obj => obj?.name);
+                console.log(projectname)
+                this.$store.commit("SET_PROJECTNAME", projectname)
             }
-            catch {
+            catch (e) {
+                console.log('e', e)
                 // const response1 = await axios.post('https://gosutasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
                 // localStorage.removeItem("token")
                 // localStorage.setItem("token", JSON.stringify(response1.data.access_token));
@@ -252,10 +233,11 @@ export default {
     },
     async mounted() {
         await this.projectShow();
+        console.log('mounted ')
         this.$store.commit("SET_SELECTED_PAGE", "company")
-        this.projects = this.remainingTime();
+        this.projects = this.projectRemainingTime();
         setInterval(() => {
-            this.projects = this.remainingTime();
+            this.projects = this.projectRemainingTime();
         }, 60000);
         this.getArchive(timestamp(this.dateRange[0]), timestamp(this.dateRange[1]));
     },

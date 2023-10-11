@@ -21,24 +21,18 @@ export default {
         menu: false,
     }),
     props: {
-        projectData: Object,
+        taskData: Object,
     },
     methods: {
         emitEditDialog() {
             this.$emit("editDialog",true)
-            this.$emit("editProject", this.projectData)
-            this.$store.commit("SET_PROJECT_EDIT",this.projectData)
-            this.$store.commit("SET_SHOW_EDIT_PROJECT", true)
+            this.$emit("editProject", this.taskData)
+            this.$store.commit("SET_TASK_EDIT", this.taskData)
+            this.$store.commit("SET_SHOW_EDIT_TASK", true)
         },
         emitDeleteProject() {
-            this.$emit("deleteProject", this.projectData);
+            this.$emit("deleteTask", this.taskData);
         },
     },
 };
 </script>
-
-<style lang="scss" scoped>
-.red-text {
-    color: red !important;
-}
-</style>    

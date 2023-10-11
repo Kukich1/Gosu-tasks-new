@@ -15,8 +15,17 @@
                 <v-list-item prepend-icon="mdi-home-city" title="Компания" value="company"
                     v-bind:disabled="!this.dataFromServer" @click="showContainer('company')"></v-list-item>
 
-                <v-list-item prepend-icon="mdi-account" title="Личные задачи" value="account"
-                    v-bind:disabled="!this.dataFromServer" @click="showContainer('account')"></v-list-item>
+
+                <div v-if="Role === 1">
+                    <v-list-item prepend-icon="mdi-account" title="Пользователи и задачи" value="tasks"
+                        v-bind:disabled="!this.dataFromServer" @click="showContainer('tasks')"></v-list-item>
+                </div>
+
+                <div v-else>
+                    <v-list-item prepend-icon="mdi-account" title="Личные задачи" value="account"
+                        v-bind:disabled="!this.dataFromServer" @click="showContainer('tasks')"></v-list-item>
+                </div>
+
 
             </v-list>
 
@@ -34,6 +43,7 @@
 <script>
 export default {
     props: {
+        Role: Number,
         drawer: Boolean,
         rail: Boolean,
         Name: String,

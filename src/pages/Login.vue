@@ -11,6 +11,7 @@
                     <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
                     <v-text-field v-model="username" 
+                        browserAutocomplete="off"
                         :rules="[required]" 
                         density="compact" 
                         :readonly="loading"
@@ -24,7 +25,8 @@
                     </div>
 
                     <v-text-field v-model.trim="password" 
-                    :rules="[required]"
+                        browserAutocomplete="off"
+                        :rules="[required]"
                         :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" 
                         :type="visible ? 'text' : 'password'"
                         density="compact" 
