@@ -22,8 +22,12 @@
                     </ContainerCompany>
                 </v-container>
 
-                <v-container v-if="this.$store.state.selectedPage === 'tasks'">
-                    <ContainerTasks :Role="parseInt(Role)"></ContainerTasks>
+                <v-container v-if="this.$store.state.selectedPage === 'allPersonTasks'">
+                    <ContainerPersonsTasks></ContainerPersonsTasks>
+                </v-container>
+
+                <v-container v-if="this.$store.state.selectedPage === 'accountTasks'">
+                    <ContainerTasks></ContainerTasks>
                 </v-container>
 
             </v-main>
@@ -39,6 +43,7 @@ import MyAppBar from '@/components/MyAppBar.vue';
 import ContainerCompany from '@/components/ContainerCompany.vue'
 import ContainerTasks from '@/components/ContainerTasks.vue'
 import timestamp from '@/utils/timestamp';
+import ContainerPersonsTasks from '@/components/ContainerPersonsTasks.vue'
 
 export default {
     components: {
@@ -47,6 +52,7 @@ export default {
         MyAppBar,
         ContainerCompany,
         ContainerTasks,
+        ContainerPersonsTasks,
     },
     data() {
         const Name = localStorage.getItem('name');
@@ -185,7 +191,7 @@ export default {
         },
         async projectShow() {
             try {
-                const response = await axios.get('https://gosutasks-api.vercel.app/company/projects/', this.getToken());
+                const response = await axios.get('https://gosu-tasks-api.vercel.app/company/projects/', this.getToken());
                 this.dataFromServer = response.data;
                 this.projects = this.dataFromServer.filter(item => item.status === 'current');
                 this.$store.commit("SET_PROJECTS", this.projectRemainingTime());
@@ -195,11 +201,11 @@ export default {
             }
             catch (e) {
                 console.log('e', e)
-                // const response1 = await axios.post('https://gosutasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
+                // const response1 = await axios.post('https://gosu-tasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
                 // localStorage.removeItem("token")
                 // localStorage.setItem("token", JSON.stringify(response1.data.access_token));
 
-                // const response = await axios.get('https://gosutasks-api.vercel.app/company/projects/', this.catchGetToken());
+                // const response = await axios.get('https://gosu-tasks-api.vercel.app/company/projects/', this.catchGetToken());
                 // this.dataFromServer = response.data;
                 // this.projects = dataFromServer.filter(item => item.status === 'current');
             }
@@ -208,15 +214,15 @@ export default {
             const preCommitPage = this.$store.state.selectedPage;
             try {
                 this.$store.commit("SET_SELECTED_PAGE", "loading")
-                const response = await axios.get(`https://gosutasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
+                const response = await axios.get(`https://gosu-tasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
                 this.archive = response.data.filter(item => item.status === 'completed');
             } catch (error) {
                 // console.error('Ошибка обновления токена:', error);
-                // const response1 = await axios.post('https://gosutasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
+                // const response1 = await axios.post('https://gosu-tasks-api.vercel.app/token/refresh/', undefined, this.getRefreshToken());
                 // localStorage.removeItem("token")
                 // localStorage.setItem("token", JSON.stringify(response1.data.access_token));
                 // this.$store.commit("SET_SELECTED_PAGE", "loading")
-                // const response = await axios.get(`https://gosutasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
+                // const response = await axios.get(`https://gosu-tasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
                 // this.archive = response.data.filter(item => item.status === 'completed');
             } finally {
                 this.$store.commit("SET_SELECTED_PAGE", preCommitPage)
@@ -238,6 +244,7 @@ export default {
         this.projects = this.projectRemainingTime();
         setInterval(() => {
             this.projects = this.projectRemainingTime();
+            this.$store.commit('SET_PROJECTS', this.projectRemainingTime());
         }, 60000);
         this.getArchive(timestamp(this.dateRange[0]), timestamp(this.dateRange[1]));
     },

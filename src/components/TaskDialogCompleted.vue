@@ -117,7 +117,7 @@ export default {
         async deleteTask(taskData) {
             try {
                 this.closeDialog();
-                const response = await axios.delete(`https://gosutasks-api.vercel.app/admin/delet_project/${taskData.task.id}`, this.getToken());
+                const response = await axios.delete(`https://gosu-tasks-api.vercel.app/admin/delet_project/${taskData.task.id}`, this.getToken());
                 console.log('Проект успешно удалена:', response.data);
                 this.tasksForProject();
             } catch {
@@ -127,7 +127,7 @@ export default {
         async completeProject(projectData) {
             try {
                 this.closeDialog();
-                const response = await axios.patch(`https://gosutasks-api.vercel.app/admin/complete_project/${projectData.project.id}`, undefined, this.getToken());
+                const response = await axios.patch(`https://gosu-tasks-api.vercel.app/admin/complete_project/${projectData.project.id}`, undefined, this.getToken());
                 console.log('Проект успешно завершон', response.data);
                 this.projectShow();
             } catch {
@@ -139,7 +139,7 @@ export default {
             this.dataLoaded = true;
             try {
                 const name = this.projectData.project.name
-                const response = await axios.get(`https://gosutasks-api.vercel.app/company/projects_tasks/${name}`, this.getToken());
+                const response = await axios.get(`https://gosu-tasks-api.vercel.app/company/projects_tasks/${name}`, this.getToken());
                 this.projectTasks = response.data
             } catch {
 

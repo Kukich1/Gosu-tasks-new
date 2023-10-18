@@ -17,13 +17,13 @@
 
 
                 <div v-if="Role === 1">
-                    <v-list-item prepend-icon="mdi-account" title="Пользователи и задачи" value="tasks"
-                        v-bind:disabled="!this.dataFromServer" @click="showContainer('tasks')"></v-list-item>
+                    <v-list-item prepend-icon="mdi-account" title="Пользователи и задачи" value="allPersonTasks"
+                        v-bind:disabled="!this.dataFromServer" @click="showContainer('allPersonTasks')"></v-list-item>
                 </div>
 
                 <div v-else>
-                    <v-list-item prepend-icon="mdi-account" title="Личные задачи" value="account"
-                        v-bind:disabled="!this.dataFromServer" @click="showContainer('tasks')"></v-list-item>
+                    <v-list-item prepend-icon="mdi-account" title="Личные задачи" value="accountTasks"
+                        v-bind:disabled="!this.dataFromServer" @click="showContainer('accountTasks')"></v-list-item>
                 </div>
 
 

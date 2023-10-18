@@ -111,7 +111,7 @@ export default {
             };
         },
         async getUserName() {
-            const response = await axios.get('https://gosutasks-api.vercel.app/admin/get_users_list/', this.getToken())
+            const response = await axios.get('https://gosu-tasks-api.vercel.app/admin/get_users_list/', this.getToken())
             const username = response.data.map(obj => obj.username)
             this.username = username
             this.project.members = this.username;
@@ -126,7 +126,7 @@ export default {
                 }
                 let id = this.$store.state.projectEdit.project.id
                 this.$store.commit("SET_SHOW_EDIT_PROJECT", false);
-                const response = await axios.put(`https://gosutasks-api.vercel.app/admin/change_project/${id}`, project, this.getToken())
+                const response = await axios.put(`https://gosu-tasks-api.vercel.app/admin/change_project/${id}`, project, this.getToken())
                 if (response.status === 200) {
                     this.projectShow();
                 } else if (response.status !== 200) {

@@ -89,7 +89,7 @@ export default {
             };
         },
         async getUserName() {
-            const response = await axios.get('https://gosutasks-api.vercel.app/admin/get_users_list/', this.getToken())
+            const response = await axios.get('https://gosu-tasks-api.vercel.app/admin/get_users_list/', this.getToken())
             const username = response.data.map(obj => obj.username)
             this.username = username
             this.project.members = this.username;
@@ -97,7 +97,7 @@ export default {
         async createProject() {
             this.project.deadline = timestamp(this.project.deadline);
             this.dialog = false;
-            const response = await axios.post('https://gosutasks-api.vercel.app/admin/create_project', this.project, this.getToken())
+            const response = await axios.post('https://gosu-tasks-api.vercel.app/admin/create_project', this.project, this.getToken())
             if (response.status === 200) {
                 this.projectShow();
                 this.project.name = '';

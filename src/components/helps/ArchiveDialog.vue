@@ -7,7 +7,7 @@
                     <div class="p-5 pl-3 pr-3 ml-2 flex flex-col gap-6 max-h-[90vh] overflow-y-auto">
                         <div class="d-flex flex-column">
                             <div class="d-flex justify-space-between align-center">
-                                <v-card-title class="text-truncate">{{ projectData.project.name }}</v-card-title>
+                                <v-card-title class="text-truncate">{{ item.name }}</v-card-title>
                                 <v-card-actions class="pa-2">
                                     <v-spacer></v-spacer>
                                     <div v-if="Role === 1">
@@ -19,7 +19,7 @@
                             <div class="p-5 pl-3 mt-4 mb-4 ml-2">
                                 Участники:
                                 <div class="d-flex flex-wrap mb-2">
-                                    <v-chip v-for="(member, index) in projectData.project.members" :key="index"
+                                    <v-chip v-for="(member, index) in item.members" :key="index"
                                         color="blue-darken-1" text-color="white" class="mr-2 mt-2">
                                         {{ member }}
                                     </v-chip>
@@ -27,10 +27,10 @@
                             </div>
                             <div class="d-flex justify-space-between align-center mb-2 ml-2">
                                 <div class="p-5 pl-3">
-                                    <strong>Создано:</strong> {{ formatTimestamp(projectData.project.created_at) }}
+                                    <strong>Создано:</strong> {{ formatTimestamp(item.created_at) }}
                                 </div>
                                 <div class="pr-14">
-                                    <strong>Дедлайн:</strong> {{ formatTimestamp(projectData.project.deadline) }}
+                                    <strong>Дедлайн:</strong> {{ formatTimestamp(item.deadline) }}
                                 </div>
                             </div>
                             <v-card-actions v-if="!dataLoaded" class="ml-2">
@@ -88,7 +88,7 @@
                                 <v-progress-circular v-if="isLoading" indeterminate color="#65b2f0"></v-progress-circular>
                             </div>
                             <v-card-text class="pr-13 mt-5">
-                                {{ projectData.project.description }}
+                                {{ item.description }}
                             </v-card-text>
                         </div>
                         <v-card-actions class="pa-2 justify-end">
@@ -118,9 +118,8 @@ export default {
         TaskDialogCompleted,
     },
     props: {
-        Role: Number,
         dialog: Boolean,
-        projectData: Object,
+        item: Object,
         projectShow: Function,
     },
     data() {
@@ -273,53 +272,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-body.modal-open {
-    overflow: hidden;
-}
-
-.no-animation .v-dialog__content {
-    transition: none !important;
-}
-
-.v-dialog.v-dialog--active::before {
-    background-color: rgba(0, 0, 0, 0.01);
-}
-
-.text-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 90%;
-}
-
-.red-card {
-    background-color: red;
-}
-
-.orange-card {
-    background-color: orange;
-}
-
-.yellow-card {
-    background-color: yellow;
-}
-
-.d-flex {
-    display: flex;
-    flex-direction: row;
-}
-
-.w-half {
-    width: 50%;
-    box-sizing: border-box;
-}
-
-.pr-2 {
-    padding-right: 2rem;
-}
-
-.pl-2 {
-    padding-left: 2rem;
-}
-</style>
+<style lang="scss" scoped></style>
