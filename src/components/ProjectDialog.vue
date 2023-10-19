@@ -31,10 +31,10 @@
                                 </div>
                                 <div class="pr-14">
                                     <strong>Создано:</strong> {{ formatTimestamp(projectData.project.created_at) }}
-                                    <div v-if="projectData.project.archive_deadline">
-                                        <div v-for="deadline in projectData.project.archive_deadline">
-                                            <strong>История дедлайна:</strong> {{ formatTimestamp(deadline) }}
-                                        </div>
+                                </div>
+                                <div v-if="projectData.project.archive_deadline">
+                                    <div v-for="deadline in projectData.project.archive_deadline">
+                                        <strong>История дедлайна:</strong> {{ formatTimestamp(deadline) }}
                                     </div>
                                 </div>
                             </div>
@@ -42,25 +42,26 @@
                                 <div>
                                     <v-btn @click="tasksForProject" v-if="!isLoading && !dataLoaded"
                                         color="blue-darken-1">Вывести список
-                                        задач</v-btn>
+                                        подзадач</v-btn>
                                 </div>
                             </v-card-actions>
                             <div v-else-if="dataLoaded && !isLoading">
                                 <div class="d-flex ml-4">
                                     <!-- Левая половина (Завершенные задания) -->
-                                    <div class="w-half pl-2">
+                                    <div>
                                         <div>
                                             <div>
-                                                Завершенные задания:
+                                                Завершенные подзадачи:
                                             </div>
-                                            <v-row>
+                                            <v-row class="row-width">
                                                 <v-col v-for="taskData in this.$store.state.completedTasks"
-                                                    :key="taskData.id">
-                                                    <v-card @click="openDialogTask(taskData)" block rounded-lg
-                                                        class="taskData">
-                                                        <template v-slot:title class="text-h6">{{ taskData.name
-                                                        }}</template>
-                                                        <template v-slot:subtitle>{{ taskData.description }}</template>
+                                                    :key="taskData.id" cols="5">
+                                                    <v-card @click="openDialogTask(taskData)" :class="CardClass(taskData)"
+                                                        block rounded-lg>
+                                                        <v-card-title class="fs-14">{{ taskData.name
+                                                        }}</v-card-title>
+                                                        <v-card-subtitle class="pb-2"> {{ taskData.description }}
+                                                        </v-card-subtitle>
                                                     </v-card>
                                                     <TaskDialogCompleted :taskData="taskData" :dialog="taskData.dialog"
                                                         @update:dialog="taskData.dialog = $event" :Role="Role">
@@ -71,19 +72,20 @@
                                     </div>
                                     <TaskEdit :tasksForProject="tasksForProject"></TaskEdit>
                                     <!-- Правая половина (Список текущих задач) -->
-                                    <div class="w-half pr-2">
+                                    <div>
                                         <div>
                                             <div>
-                                                Список текущих задач:
+                                                Список текущих подзадач:
                                             </div>
-                                            <v-row>
+                                            <v-row v-row class="row-width">
                                                 <v-col v-for="taskData in this.$store.state.currentTasks"
-                                                    :key="taskData.task.id" cols="4">
+                                                    :key="taskData.task.id" cols="5">
                                                     <v-card @click="openDialogTask(taskData)" :class="CardClass(taskData)"
                                                         block rounded-lg>
-                                                        <template v-slot:title class="text-h6">{{ taskData.task.name
-                                                        }}</template>
-                                                        <template v-slot:subtitle>{{ taskData.task.description }}</template>
+                                                        <v-card-title class="fs-14">{{ taskData.task.name
+                                                        }}</v-card-title>
+                                                        <v-card-subtitle class="pb-2">{{ taskData.task.description
+                                                        }}</v-card-subtitle>
                                                     </v-card>
                                                     <TaskDialog :taskData="taskData" :dialog="taskData.dialog"
                                                         @update:dialog="taskData.dialog = $event" :Role="Role"></TaskDialog>
@@ -138,6 +140,7 @@ export default {
             show: true,
             isLoading: false,
             dataLoaded: false,
+            alert: false,
         }
     },
     methods: {
@@ -198,8 +201,8 @@ export default {
         CardClass(taskData) {
             console.log(taskData)
             const cardClass = {
-                'ma-4': true,
-                'pa-2': true,
+                'ma-2': true,
+                'mt-5': true,
             };
             console.log(taskData.urgency);
             if (taskData.urgency == 1) {
@@ -208,6 +211,8 @@ export default {
                 cardClass['orange-card'] = true;
             } else if (taskData.urgency == 3) {
                 cardClass['yellow-card'] = true;
+            } else if (taskData.urgency == undefined) {
+                cardClass['green-card'] = true;
             }
             return Object.keys(cardClass).join(" ");
         },
@@ -241,11 +246,11 @@ export default {
         async completeProject(projectData) {
             try {
                 this.closeModal();
-                const response = await axios.patch(`https://gosu-tasks-api.vercel.app/admin/complete_project/${projectData.project.id}`, undefined, this.getToken());
+                const response = await axios.patch(`https://gosu-tasks-api.vercel.app/admin/complete_project/${projectData.project.id}`, undefined, this.getToken())
                 console.log('Проект успешно завершен', response.data);
                 this.projectShow();
-            } catch {
-
+            } catch (e) {
+                this.$store.commit('SET_SHOW_ALERT', true)
             }
         },
         async tasksForProject() {
@@ -256,7 +261,7 @@ export default {
                 const name = this.projectData.project.name
                 const response = await axios.get(`https://gosu-tasks-api.vercel.app/company/projects_tasks/${name}`, this.getToken());
                 this.projectTasks = response.data;
-                const completedTasks = this.projectTasks.filter(item => item.status === 'complete');
+                const completedTasks = this.projectTasks.filter(item => item.status === 'completed');
                 const currentTasks = this.projectTasks.filter(item => item.status === 'current');
                 this.projectTasks = currentTasks
                 this.$store.commit("SET_CURRENT_TASKS", this.taskRemainingTime());
@@ -303,15 +308,19 @@ body.modal-open {
 }
 
 .red-card {
-    border: 1px solid red;
+    border: 2px solid red;
 }
 
 .orange-card {
-    border: 1px solid orange;
+    border: 2px solid orange;
 }
 
 .yellow-card {
-    border: 1px solid yellow;
+    border: 2px solid yellow;
+}
+
+.green-card {
+    border: 2px solid limegreen;
 }
 
 .d-flex {
@@ -332,9 +341,11 @@ body.modal-open {
     padding-left: 2rem;
 }
 
-.taskData {
-    border: 1px solid green;
-    padding-top: 18%;
-    margin-top: 10%;
+.fs-14 {
+    font-size: 14px;
+}
+
+.row-width {
+    width: 120%;
 }
 </style>

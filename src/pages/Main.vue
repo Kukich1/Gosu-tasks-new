@@ -1,4 +1,4 @@
-<template>        
+<template>
     <v-card>
         <v-layout>
 
@@ -38,11 +38,12 @@
 <script>
 import axios from 'axios';
 import ProjectCreate from '@/components/ProjectCreate.vue';
+import { getTimestampEnd, getTimestampStart } from "@/utils/dates";
 import MyDrawer from '@/components/MyDrawer.vue';
 import MyAppBar from '@/components/MyAppBar.vue';
 import ContainerCompany from '@/components/ContainerCompany.vue'
 import ContainerTasks from '@/components/ContainerTasks.vue'
-import timestamp from '@/utils/timestamp';
+import timestamp from '@/utils/dates';
 import ContainerPersonsTasks from '@/components/ContainerPersonsTasks.vue'
 
 export default {
@@ -214,7 +215,7 @@ export default {
             const preCommitPage = this.$store.state.selectedPage;
             try {
                 this.$store.commit("SET_SELECTED_PAGE", "loading")
-                const response = await axios.get(`https://gosu-tasks-api.vercel.app/company/completed_projects?start=${start}&end=${end}`, this.getToken());
+                const response = await axios.get(`https://gosu-tasks-api.vercel.app/company/completed_projects?start=${getTimestampStart(start*1000)}&end=${getTimestampEnd(end*1000)}`, this.getToken());
                 this.archive = response.data.filter(item => item.status === 'completed');
             } catch (error) {
                 // console.error('Ошибка обновления токена:', error);

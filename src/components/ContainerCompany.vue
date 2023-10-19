@@ -8,7 +8,6 @@
                 <v-tab value="current">Проекты</v-tab>
                 <v-tab value="completed">Архив</v-tab>
             </v-tabs>
-
             <v-card-text class="v_card_text">
                 <v-window :model-value="tab" v-on:update:model-value="this.$emit('update:tab', $event)">
                     <v-window-item value="current">
@@ -56,21 +55,22 @@
                                 </ProjectDialog>
                             </v-col>
                             <ProjectEdit :projectShow="projectShow"></ProjectEdit>
+                            <Alert></Alert>
                         </v-row>
                     </v-window-item>
-                    <v-window-item value="completed" style="height: 500px;" class="scrollable-container">
+                    <v-window-item value="completed" style="height: 500px;" >
                         <v-row>
                             <v-col cols="12" style="padding:20px">
                                 <Datepicker :model-value="this.dateRange"
-                                    @update:model-value="this.$emit('update:dateRange', $event)" range :maxDate="new Date()"
-                                    :enableTimePicker="false" locale="ru" select-text="Выбрать" cancel-text="Отменить"
-                                    :startTime="[{ hours: 0, minutes: 0 }, { hours: 23, minutes: 59 }]" :clearable="false"
-                                    class="custom-datepicker" style="width: 100%;" />
+                                    @update:model-value="this.$emit('update:dateRange', $event)" range :max-date="new Date()"
+                                    :enable-time-picker="false" locale="ru" select-text="Выбрать" cancel-text="Отменить"
+                                    :start-time="[{ hours: 0, minutes: 0, seconds: 1 }, { hours: 23, minutes: 59, seconds: 59 }]"
+                                    :clearable="false" class="custom-datepicker" style="width: 100%;" />
                             </v-col>
-                            <v-col block class="ma-2" v-if="archive.length > 0" v-for="item in archive" :key="item.id"
-                                cols="4">
+                            <v-col block v-if="archive.length > 0" v-for="item in archive" :key="item.id"
+                                cols="4" style="padding:20px" class="scrollable-container">
                                 <v-card block @click="openDialogArchive(item)" class="ma-2 pa-2"
-                                    style="min-height: 375px; border-radius: 20px; border: 2px solid #00E676;">
+                                    style="min-height: 375px; border-radius: 20px; border: 2px solid limegreen;">
                                     <v-card-title>{{ item.name }}</v-card-title>
                                     <v-card-subtitle>{{ item.description }}</v-card-subtitle>
                                     <br />
@@ -106,6 +106,7 @@ import '@vuepic/vue-datepicker/dist/main.css';
 import ProjectDialog from '@/components/ProjectDialog.vue'
 import ProjectEdit from '@/components/ProjectEdit.vue'
 import ArchiveDialog from '@/components/helps/ArchiveDialog.vue'
+import Alert from '@/components/helps/Alert.vue'
 
 export default {
     async created() {
@@ -123,6 +124,7 @@ export default {
         ProjectDialog,
         ProjectEdit,
         ArchiveDialog,
+        Alert,
     },
     data() {
         return {
@@ -147,7 +149,6 @@ export default {
                 const date = new Date(timestampInMilliseconds);
                 return date.toLocaleString();
             }
-
             return '';
         },
         EditShow(newValue) {
@@ -168,7 +169,6 @@ export default {
             } else if (projectData.urgency == 2) {
                 cardClass['yellow-card'] = true;
             }
-
             return cardClass;
         },
         openDialogProject(projectData) {
@@ -193,6 +193,7 @@ export default {
         }
     }
 };
+
 </script>
 
 <style lang="scss" scoped>
@@ -240,26 +241,5 @@ export default {
 .v_card_text {
     height: calc(100vh - 176px);
     overflow: auto;
-}
-
-.v_card_text::-webkit-scrollbar {
-    width: 10px;
-}
-
-.v_card_text::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
-}
-
-.v_card_text::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 6px;
-}
-
-.v_card_text::-webkit-scrollbar-thumb:hover {
-    background-color: #777;
-}
-
-.v_card_text::-webkit-scrollbar-thumb:active {
-    background-color: #999;
 }
 </style>

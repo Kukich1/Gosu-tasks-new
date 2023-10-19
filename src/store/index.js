@@ -11,6 +11,7 @@ const store = createStore({
     completedTasks: [],
     showEditTask: false,
     taskEdit: [],
+    showAlert: false,
   },
   getters: {
   },
@@ -66,11 +67,17 @@ const store = createStore({
     SET_TASK_EDIT_PROJECT(state, data) {
       state.taskEdit.task.project = data
     },
-    SET_CURRENT_TASKS(state, data){
+    SET_CURRENT_TASKS(state, data) {
       state.currentTasks = data
     },
-    SET_COMPLETED_TASKS(state, data){
+    SET_COMPLETED_TASKS(state, data) {
       state.completedTasks = data
+    },
+    SET_SHOW_ALERT(state, data) {
+      state.showAlert = data;
+      setTimeout(() => {
+        state.showAlert = false;
+      }, 3000);
     },
   },
   actions: {

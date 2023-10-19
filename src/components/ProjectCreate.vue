@@ -50,7 +50,7 @@
 
 <script>
 import axios from 'axios'
-import timestamp from "@/utils/timestamp"
+import timestamp from "@/utils/dates"
 
 export default {
     props: {

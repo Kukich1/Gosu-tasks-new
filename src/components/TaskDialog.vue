@@ -11,7 +11,7 @@
                                     <v-spacer></v-spacer>
                                     <div v-if="Role === 1">
                                         <TaskVerticalThreeDots :taskData="taskData" @editDialog="showDialog"
-                                            @deleteTask="deleteTask(taskData)" />
+                                            @deleteTask="deleteTask(taskData)"/>
                                     </div>
                                 </v-card-actions>
                             </div>
@@ -118,7 +118,7 @@ export default {
             try {
                 this.closeDialog();
                 const response = await axios.delete(`https://gosu-tasks-api.vercel.app/admin/delet_project/${taskData.task.id}`, this.getToken());
-                console.log('Проект успешно удалена:', response.data);
+                console.log('Проект успешно удален:', response.data);
                 this.tasksForProject();
             } catch {
 
@@ -128,7 +128,7 @@ export default {
             try {
                 this.closeDialog();
                 const response = await axios.patch(`https://gosu-tasks-api.vercel.app/admin/complete_project/${projectData.project.id}`, undefined, this.getToken());
-                console.log('Проект успешно завершон', response.data);
+                console.log('Проект успешно завершен', response.data);
                 this.projectShow();
             } catch {
 
