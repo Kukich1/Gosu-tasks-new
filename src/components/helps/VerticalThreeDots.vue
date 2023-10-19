@@ -9,7 +9,7 @@
 
             <v-list>
                 <v-list-item @click="emitEditDialog">Edit</v-list-item>
-                <v-list-item class="red-text" @click="emitDeleteProject">Delete</v-list-item>
+                <v-list-item class="red-text" @click="emitDeleteProject(this.projectData)">Delete</v-list-item>
             </v-list>
         </v-menu>
     </div>
@@ -32,6 +32,7 @@ export default {
         },
         emitDeleteProject() {
             this.$emit("deleteProject", this.projectData);
+            console.log('delete true!!!!')
         },
     },
 };

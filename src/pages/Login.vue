@@ -78,7 +78,7 @@ export default {
                     username: this.username,
                     password: this.password,
                 }
-                const response = await axios.post('https://gosu-tasks-api.vercel.app/auth/login/', postData)
+                const response = await axios.post('https://gosutasks-api.vercel.app/auth/login/', postData)
                 localStorage.setItem("token", JSON.stringify(response.data.access_token))
                 localStorage.setItem("refresh_token", JSON.stringify(response.data.refresh_token))
                 localStorage.setItem("role", JSON.stringify(response.data.role))

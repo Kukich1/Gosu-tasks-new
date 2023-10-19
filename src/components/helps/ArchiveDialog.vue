@@ -27,10 +27,10 @@
                             </div>
                             <div class="d-flex justify-space-between align-center mb-2 ml-2">
                                 <div class="p-5 pl-3">
-                                    <strong>Создано:</strong> {{ formatTimestamp(item.created_at) }}
+                                    <strong>Дедлайн:</strong> {{ formatTimestamp(item.deadline) }}
                                 </div>
                                 <div class="pr-14">
-                                    <strong>Дедлайн:</strong> {{ formatTimestamp(item.deadline) }}
+                                    <strong>Создано:</strong> {{ formatTimestamp(item.created_at) }}
                                 </div>
                             </div>
                             <v-card-actions v-if="!dataLoaded" class="ml-2">
@@ -223,7 +223,7 @@ export default {
             try {
                 this.closeDialog();
                 const response = await axios.delete(`https://gosu-tasks-api.vercel.app/admin/delet_project/${projectData.project.id}`, this.getToken());
-                console.log('Проект успешно удалена:', response.data);
+                console.log('Проект успешно удален:', response.data);
                 this.projectShow();
             } catch {
 
@@ -233,7 +233,7 @@ export default {
             try {
                 this.closeDialog();
                 const response = await axios.patch(`https://gosu-tasks-api.vercel.app/admin/complete_project/${projectData.project.id}`, undefined, this.getToken());
-                console.log('Проект успешно завершон', response.data);
+                console.log('Проект успешно завершен', response.data);
                 this.projectShow();
             } catch {
 

@@ -27,15 +27,21 @@
                             </div>
                             <div class="d-flex justify-space-between align-center mb-2 ml-2">
                                 <div class="p-5 pl-3">
-                                    <strong>Создано:</strong> {{ formatTimestamp(projectData.project.created_at) }}
+                                    <strong>Дедлайн:</strong> {{ formatTimestamp(projectData.project.deadline) }}
                                 </div>
                                 <div class="pr-14">
-                                    <strong>Дедлайн:</strong> {{ formatTimestamp(projectData.project.deadline) }}
+                                    <strong>Создано:</strong> {{ formatTimestamp(projectData.project.created_at) }}
+                                    <div v-if="projectData.project.archive_deadline">
+                                        <div v-for="deadline in projectData.project.archive_deadline">
+                                            <strong>История дедлайна:</strong> {{ formatTimestamp(deadline) }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <v-card-actions v-if="!dataLoaded" class="ml-2">
                                 <div>
-                                    <v-btn @click="tasksForProject" v-if="!isLoading && !dataLoaded">Вывести список
+                                    <v-btn @click="tasksForProject" v-if="!isLoading && !dataLoaded"
+                                        color="blue-darken-1">Вывести список
                                         задач</v-btn>
                                 </div>
                             </v-card-actions>
@@ -48,15 +54,17 @@
                                                 Завершенные задания:
                                             </div>
                                             <v-row>
-                                                <v-col v-for="taskData in this.$store.state.completedTasks" :key="taskData.id" cols="4">
-                                                    <v-card @click="openDialogTask(taskData)" color="green-accent-3"
-                                                        block rounded-lg>
+                                                <v-col v-for="taskData in this.$store.state.completedTasks"
+                                                    :key="taskData.id">
+                                                    <v-card @click="openDialogTask(taskData)" block rounded-lg
+                                                        class="taskData">
                                                         <template v-slot:title class="text-h6">{{ taskData.name
                                                         }}</template>
                                                         <template v-slot:subtitle>{{ taskData.description }}</template>
                                                     </v-card>
                                                     <TaskDialogCompleted :taskData="taskData" :dialog="taskData.dialog"
-                                                        @update:dialog="taskData.dialog = $event" :Role="Role"></TaskDialogCompleted>
+                                                        @update:dialog="taskData.dialog = $event" :Role="Role">
+                                                    </TaskDialogCompleted>
                                                 </v-col>
                                             </v-row>
                                         </div>
@@ -69,7 +77,8 @@
                                                 Список текущих задач:
                                             </div>
                                             <v-row>
-                                                <v-col v-for="taskData in this.$store.state.currentTasks" :key="taskData.task.id" cols="4">
+                                                <v-col v-for="taskData in this.$store.state.currentTasks"
+                                                    :key="taskData.task.id" cols="4">
                                                     <v-card @click="openDialogTask(taskData)" :class="CardClass(taskData)"
                                                         block rounded-lg>
                                                         <template v-slot:title class="text-h6">{{ taskData.task.name
@@ -105,7 +114,7 @@
 
 <script>
 import axios from 'axios';
-import VerticalThreeDots from '@/components/helps/VerticalThreeDots';
+import VerticalThreeDots from '@/components/helps/VerticalThreeDots.vue';
 import TaskDialog from '@/components/TaskDialog.vue'
 import TaskEdit from '@/components/TaskEdit.vue'
 import TaskDialogCompleted from '@/components/TaskDialogCompleted.vue'
@@ -200,7 +209,6 @@ export default {
             } else if (taskData.urgency == 3) {
                 cardClass['yellow-card'] = true;
             }
-
             return Object.keys(cardClass).join(" ");
         },
         formatTimestamp(timestamp) {
@@ -222,9 +230,9 @@ export default {
         },
         async deleteProject(projectData) {
             try {
-                this.closeDialog();
+                this.closeModal();
                 const response = await axios.delete(`https://gosu-tasks-api.vercel.app/admin/delet_project/${projectData.project.id}`, this.getToken());
-                console.log('Проект успешно удалена:', response.data);
+                console.log('Проект успешно удален:', response.data);
                 this.projectShow();
             } catch {
 
@@ -232,9 +240,9 @@ export default {
         },
         async completeProject(projectData) {
             try {
-                this.closeDialog();
+                this.closeModal();
                 const response = await axios.patch(`https://gosu-tasks-api.vercel.app/admin/complete_project/${projectData.project.id}`, undefined, this.getToken());
-                console.log('Проект успешно завершон', response.data);
+                console.log('Проект успешно завершен', response.data);
                 this.projectShow();
             } catch {
 
@@ -249,7 +257,8 @@ export default {
                 const response = await axios.get(`https://gosu-tasks-api.vercel.app/company/projects_tasks/${name}`, this.getToken());
                 this.projectTasks = response.data;
                 const completedTasks = this.projectTasks.filter(item => item.status === 'complete');
-                this.projectTasks = this.projectTasks.filter(item => item.status === 'current');
+                const currentTasks = this.projectTasks.filter(item => item.status === 'current');
+                this.projectTasks = currentTasks
                 this.$store.commit("SET_CURRENT_TASKS", this.taskRemainingTime());
                 this.$store.commit("SET_COMPLETED_TASKS", completedTasks)
             } catch {
@@ -294,15 +303,15 @@ body.modal-open {
 }
 
 .red-card {
-    background-color: red;
+    border: 1px solid red;
 }
 
 .orange-card {
-    background-color: orange;
+    border: 1px solid orange;
 }
 
 .yellow-card {
-    background-color: yellow;
+    border: 1px solid yellow;
 }
 
 .d-flex {
@@ -321,5 +330,11 @@ body.modal-open {
 
 .pl-2 {
     padding-left: 2rem;
+}
+
+.taskData {
+    border: 1px solid green;
+    padding-top: 18%;
+    margin-top: 10%;
 }
 </style>

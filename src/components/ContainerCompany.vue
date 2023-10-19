@@ -2,33 +2,34 @@
     <!-- <div>
         <pre>{{ projects }}</pre>
     </div> -->
-    <v-card>
-        <v-tabs align-tabs="title" grow @update:model-value="this.$emit('update:tab', $event)" :model-value="tab">
-            <v-tab value="current">Проекты</v-tab>
-            <v-tab value="completed">Архив</v-tab>
-        </v-tabs>
+    <div class="company_container">
+        <v-card>
+            <v-tabs align-tabs="title" grow @update:model-value="this.$emit('update:tab', $event)" :model-value="tab">
+                <v-tab value="current">Проекты</v-tab>
+                <v-tab value="completed">Архив</v-tab>
+            </v-tabs>
 
-        <v-card-text style="height: calc(100vh - 176px); overflow-y: scroll;">
-            <v-window :model-value="tab" v-on:update:model-value="this.$emit('update:tab', $event)">
-                <v-window-item value="current">
-                    <v-row>
-                        <v-col v-for="projectData in this.$store.state.projects" :key="projectData?.id" cols="4"
-                            style="padding:20px" class="scrollable-container">
-                            <v-card v-if="projectData.project" @click="openDialogProject(projectData)"
-                                :class="getCardClass(projectData)" class="ma-2 pa-2" block rounded-lg
-                                style="min-height: 375px; border-radius: 20px;">
-                                <!-- <div class="card-image"
-                                style="background-image: src='../IMG/resource.png'; 
-                                background-position: top; background-size: cover;"> -->
+            <v-card-text class="v_card_text">
+                <v-window :model-value="tab" v-on:update:model-value="this.$emit('update:tab', $event)">
+                    <v-window-item value="current">
+                        <v-row>
+                            <v-col v-for="projectData in this.$store.state.projects" :key="projectData?.id" cols="4"
+                                style="padding:20px" class="scrollable-container">
+                                <v-card v-if="projectData.project" @click="openDialogProject(projectData)"
+                                    :class="getCardClass(projectData)" class="ma-2 pa-2" block rounded-lg
+                                    style="min-height: 375px; border-radius: 20px;">
+                                    <!-- <div class="card-image"
+                                    style="background-image: src='../IMG/resource.png'; 
+                                    background-position: top; background-size: cover;"> -->
                                     <v-card-title>{{ projectData.project.name }}</v-card-title>
                                     <v-card-subtitle>{{ projectData.project.description }}</v-card-subtitle>
-                                    <br/>
-                                    <br/>
+                                    <br />
+                                    <br />
                                     <v-divider></v-divider>
                                     <br />
                                     <br />
-                                    <v-progress-linear model-value="10" color="light-blue" height="10"
-                                        striped></v-progress-linear>
+                                    <v-progress-linear :model-value="calculateProgress(projectData)" color="light-blue"
+                                        height="10" striped></v-progress-linear>
                                     <br />
                                     <br />
                                     <v-card-text>
@@ -48,42 +49,55 @@
                                             </div>
                                         </div>
                                     </v-card-text>
-                            </v-card>
-                            <ProjectDialog :Role="Role" :projectShow="projectShow"
-                                @update:dialog="projectData.dialog = $event" :dialog="projectData.dialog"
-                                :projectData="projectData" @edit:dialog="EditShow" ref="projectDialog">
-                            </ProjectDialog>
-                        </v-col>
-                        <ProjectEdit :projectShow="projectShow"></ProjectEdit>
-                    </v-row>
-                </v-window-item>
-                <v-window-item value="completed" style="height: 500px;" class="scrollable-container">
-                    <v-row>
-                        <v-col cols="12" style="padding:20px">
-                            <Datepicker :model-value="this.dateRange"
-                                @update:model-value="this.$emit('update:dateRange', $event)" range :maxDate="new Date()"
-                                :enableTimePicker="false" locale="ru" select-text="Выбрать" cancel-text="Отменить"
-                                :startTime="[{ hours: 0, minutes: 0 }, { hours: 23, minutes: 59 }]" :clearable="false"
-                                class="custom-datepicker" style="width: 100%;" />
-                        </v-col>
-                        <v-col block class="ma-2" v-if="archive.length > 0" v-for="item in archive" :key="item.id" cols="4">
-                            <v-card block @click="openDialogArchive(item)" class="ma-2 pa-2" style="min-height: 375px; border-radius: 20px; border: 2px solid #00E676;">
-                                <v-card-title>{{ item.name }}</v-card-title>
-                                <v-card-subtitle>{{ item.description }}</v-card-subtitle>
-                                <br/>
-                                <br/>
-                                <v-divider></v-divider>
-                                <br/>
-                                <br/>
-                                <v-card-text>{{ item.time_completed }}</v-card-text>
-                            </v-card>
-                            <ArchiveDialog :dialog="item.dialog" @update:dialog="item.dialog = $event" :item="item"></ArchiveDialog>
-                        </v-col>
-                    </v-row>
-                </v-window-item>
-            </v-window>
-        </v-card-text>
-    </v-card>
+                                </v-card>
+                                <ProjectDialog :Role="Role" :projectShow="projectShow"
+                                    @update:dialog="projectData.dialog = $event" :dialog="projectData.dialog"
+                                    :projectData="projectData" @edit:dialog="EditShow" ref="projectDialog">
+                                </ProjectDialog>
+                            </v-col>
+                            <ProjectEdit :projectShow="projectShow"></ProjectEdit>
+                        </v-row>
+                    </v-window-item>
+                    <v-window-item value="completed" style="height: 500px;" class="scrollable-container">
+                        <v-row>
+                            <v-col cols="12" style="padding:20px">
+                                <Datepicker :model-value="this.dateRange"
+                                    @update:model-value="this.$emit('update:dateRange', $event)" range :maxDate="new Date()"
+                                    :enableTimePicker="false" locale="ru" select-text="Выбрать" cancel-text="Отменить"
+                                    :startTime="[{ hours: 0, minutes: 0 }, { hours: 23, minutes: 59 }]" :clearable="false"
+                                    class="custom-datepicker" style="width: 100%;" />
+                            </v-col>
+                            <v-col block class="ma-2" v-if="archive.length > 0" v-for="item in archive" :key="item.id"
+                                cols="4">
+                                <v-card block @click="openDialogArchive(item)" class="ma-2 pa-2"
+                                    style="min-height: 375px; border-radius: 20px; border: 2px solid #00E676;">
+                                    <v-card-title>{{ item.name }}</v-card-title>
+                                    <v-card-subtitle>{{ item.description }}</v-card-subtitle>
+                                    <br />
+                                    <br />
+                                    <v-divider></v-divider>
+                                    <br />
+                                    <br />
+                                    <v-card-text>
+                                        <div class="deadline-info">
+                                            <strong>Дата завершения:</strong>
+                                            {{ formattedDate(item.time_completed) }}
+                                        </div>
+                                    </v-card-text>
+                                </v-card>
+                                <ArchiveDialog :dialog="item.dialog" @update:dialog="item.dialog = $event" :item="item">
+                                </ArchiveDialog>
+                            </v-col>
+                            <!-- Пустое место, если нет элементов в текущем временном диапазоне -->
+                            <v-col cols="12" v-else class="text-h3 align-center">
+                                Пусто
+                            </v-col>
+                        </v-row>
+                    </v-window-item>
+                </v-window>
+            </v-card-text>
+        </v-card>
+    </div>
 </template>
 
 <script>
@@ -118,7 +132,24 @@ export default {
             eidtDialog: false,
         };
     },
+
     methods: {
+        calculateProgress(projectData) {
+            if (projectData.project.task_count === 0) {
+                return 0; // Если нет задач, прогресс 0%
+            }
+            const progress = (projectData.project.task_completed_count / projectData.project.task_count) * 100;
+            return progress;
+        },
+        formattedDate(time_completed) {
+            if (time_completed) {
+                const timestampInMilliseconds = time_completed * 1000;
+                const date = new Date(timestampInMilliseconds);
+                return date.toLocaleString();
+            }
+
+            return '';
+        },
         EditShow(newValue) {
             this.eidtDialog = newValue
             this.$emit('edit:dialog', this.eidtDialog)
@@ -144,7 +175,7 @@ export default {
             projectData.dialog = true;
             this.selectedProjectData = projectData;
         },
-        openDialogArchive(item){
+        openDialogArchive(item) {
             item.dialog = true;
         },
         "$store.state.projects": function (newVal) {
@@ -185,7 +216,6 @@ export default {
 .progress {
     height: 100%;
     background-color: #65B2F0;
-    /* Цвет полосы прогресса */
 }
 
 .scrollable-container {
@@ -207,4 +237,29 @@ export default {
     width: 50vh;
 }
 
+.v_card_text {
+    height: calc(100vh - 176px);
+    overflow: auto;
+}
+
+.v_card_text::-webkit-scrollbar {
+    width: 10px;
+}
+
+.v_card_text::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.v_card_text::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+}
+
+.v_card_text::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+}
+
+.v_card_text::-webkit-scrollbar-thumb:active {
+    background-color: #999;
+}
 </style>

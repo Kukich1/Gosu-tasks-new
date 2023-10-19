@@ -18,7 +18,7 @@
                                     <v-text-field v-model="task.name" label="Имя Задачи" required></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-textarea v-model="task.description" label="Описания"></v-textarea>
+                                    <v-textarea v-model="task.description" label="Описание"></v-textarea>
                                 </v-col>
                                 <v-col cols="12" sm="3">
                                     <v-text-field v-model="task.deadline" label="Дедлайн" type="date" required
