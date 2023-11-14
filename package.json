@@ -10,24 +10,24 @@
     "@mathieustan/vue-datepicker": "^0.2.11",
     "@mdi/font": "5.9.55",
     "@vuepic/vue-datepicker": "^6.1.0",
-    "axios": "^1.5.0",
-    "core-js": "^3.8.3",
-    "roboto-fontface": "*",
-    "vue": "^3.2.13",
+    "axios": "^1.6.1",
+    "core-js": "^3.33.2",
+    "roboto-fontface": "^0.10.0",
+    "vue": "^3.3.8",
     "vue-material-design-icons": "^5.2.0",
-    "vue-router": "^4.0.3",
-    "vuetify": "^3.3.19",
+    "vue-router": "^4.2.5",
+    "vuetify": "^3.4.0",
     "vuex": "^4.1.0",
-    "webfontloader": "^1.0.0"
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-router": "~5.0.0",
-    "@vue/cli-plugin-vuex": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "sass": "^1.32.7",
-    "sass-loader": "^12.0.0",
+    "@vue/cli-plugin-babel": "~5.0.8",
+    "@vue/cli-plugin-router": "~5.0.8",
+    "@vue/cli-plugin-vuex": "~5.0.8",
+    "@vue/cli-service": "~5.0.8",
+    "sass": "^1.69.5",
+    "sass-loader": "^12.6.0",
     "vue-cli-plugin-vuetify": "~2.5.8",
-    "webpack-plugin-vuetify": "^2.0.0-alpha.0"
+    "webpack-plugin-vuetify": "^2.0.1"
   }
 }
