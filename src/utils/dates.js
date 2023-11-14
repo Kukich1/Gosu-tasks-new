@@ -8,12 +8,11 @@ export default function timestamp(date = new Date()) {
 export function getTimestampStart(date = new Date()) {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0);
-    return Math.floor(startOfDay.valueOf()/1000);
+    return Math.floor(startOfDay.valueOf() / 1000);
 }
 
 export function getTimestampEnd(date = new Date()) {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59);
-    console.log(endOfDay)
-    return Math.ceil(endOfDay.valueOf()/1000);
+    return Math.ceil(endOfDay.valueOf() / 1000);
 }
