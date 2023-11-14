@@ -12,6 +12,7 @@
     "@vuepic/vue-datepicker": "^6.1.0",
     "axios": "^1.6.1",
     "core-js": "^3.33.2",
+    "date-fns": "^2.30.0",
     "roboto-fontface": "^0.10.0",
     "vue": "^3.3.8",
     "vue-material-design-icons": "^5.2.0",
