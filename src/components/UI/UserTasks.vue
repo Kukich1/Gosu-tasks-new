@@ -7,9 +7,9 @@
             <div v-else>
                 <v-btn @click="OpenDate" style="margin-bottom:0.5rem" variant="outlined">
                     <v-icon>mdi-file-export</v-icon>
-                    <b>Excel {{this.selectedUser}}</b>
+                    <b>Excel {{ this.selectedUser }}</b>
                 </v-btn>
-                
+
                 <div class="d-flex">
                     <div style="width:200px">
                         <v-text-field v-model="SearchQuery" label="Название проекта"></v-text-field>
@@ -47,8 +47,8 @@
                         </div>
                     </div>
                     <transition-group name="task_current">
-                        <div class="table-row" v-for="task in this.$store.state.chose_user_current_tasks" :key="task.task.id"
-                            @click="setActiveTask(task)">
+                        <div class="table-row" v-for="task in this.$store.state.chose_user_current_tasks"
+                            :key="task.task.id" @click="setActiveTask(task)">
                             <div class="cell task-project hover-effect">
                                 <div class="task">
                                     <v-container>
@@ -171,9 +171,10 @@ export default {
 
 .modal {
     width: 100%;
+    overflow: scroll;
     height: 100%;
     background-color: white;
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 65px 0.5rem;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
 }
 
@@ -255,9 +256,16 @@ export default {
 }
 
 .tasks-table {
+    max-height: 300px;
+    overflow-y: auto;
     display: table;
     width: 100%;
     border-collapse: collapse;
+}
+
+.task-project-header .task,
+.task-project .task {
+    max-height: 50px;
 }
 
 .table-row {
@@ -350,5 +358,4 @@ export default {
     position: fixed;
     left: -3vh;
     top: 90vh;
-}
-</style>
+}</style>

@@ -222,7 +222,7 @@
 import TaskVerticalThreeDots from '@/components/UI/helps/TaskVerticalThreeDots.vue';
 import SubTaskCompleted from '@/components/UI/helps/SubTaskCompleted.vue';
 import SubTaskCurrent from '@/components/UI/helps/SubTaskCurrent.vue';
-import SubTaskEdit from './SubTaskEdit.vue';
+import SubTaskEdit from '@/components/UI/helps/SubTaskEdit.vue';
 import axios from 'axios';
 export default {
     components: {

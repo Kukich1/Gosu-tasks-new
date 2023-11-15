@@ -6,15 +6,17 @@
                 <b>Excel Все</b>
             </v-btn>
             <v-text-field v-model="SearchName" label="Имя"></v-text-field>
-            <div class="padding">
-                <transition-group name="list">
-                    <div v-for="(user,index) in this.$store.state.users_names" :key="'user_' + index" @click="openModal(user)"
-                        :class="{ 'selected': user === selectedUser }">
-                        <div class="hover">
-                            <span class="username">{{ user }}</span>
+            <div style="height: 80vh;overflow-y: scroll;">
+                <div class="padding">
+                    <transition-group name="list">
+                        <div v-for="(user, index) in this.$store.state.users_names" :key="'user_' + index"
+                            @click="openModal(user)" :class="{ 'selected': user === selectedUser }">
+                            <div class="hover">
+                                <span class="username">{{ user }}</span>
+                            </div>
                         </div>
-                    </div>
-                </transition-group>
+                    </transition-group>
+                </div>
             </div>
         </div>
         <ExportAllUserPosts :showDate="showDate" @update:showDate="CloseDate" :dateRange="dateRange"
@@ -139,6 +141,7 @@
                             </transition-group>
                         </v-col>
                     </v-row>
+                    <TaskEdit></TaskEdit>
                 </v-container>
             </div>
         </div>
@@ -152,6 +155,7 @@ import ExportUserPosts from '@/components/UI/helps/ExportUserPosts.vue';
 import UserTasksArchive from '@/components/UI/UserTasksArchive.vue';
 import UserPostsArchive from '@/components/UI/UserPostsArchive.vue';
 import TaskDialog from '@/components/UI/helps/TaskDialog.vue';
+import TaskEdit from '@/components/UI/helps/TaskEdit.vue';
 import SubTaskCurrent from './UI/helps/SubTaskCurrent.vue';
 import axios from 'axios';
 import timestamp from '@/utils/dates';
@@ -165,6 +169,7 @@ export default {
         UserTasksArchive,
         UserPostsArchive,
         TaskDialog,
+        TaskEdit,
         SubTaskCurrent,
     },
     props: {
@@ -601,6 +606,7 @@ export default {
 .green-card {
     border: solid 2px green;
 }
+
 .list-item {
     display: inline-block;
     margin-right: 10px;

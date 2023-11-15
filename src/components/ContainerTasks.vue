@@ -182,6 +182,7 @@
                 </v-row>
             </v-container>
         </div>
+        <SubTaskEdit></SubTaskEdit>
     </div>
 </template>
     
@@ -190,6 +191,7 @@ import UserTasksArchive from '@/components/UI/UserTasksArchive.vue';
 import UserPostsArchive from '@/components/UI/UserPostsArchive.vue';
 import TaskDialog from '@/components/UI/helps/TaskDialog.vue';
 import SubTaskCurrent from '@/components/UI/helps/SubTaskCurrent.vue';
+import SubTaskEdit from '@/components/UI/helps/SubTaskEdit.vue';
 import axios from 'axios'
 export default {
     components: {
@@ -197,6 +199,7 @@ export default {
         UserPostsArchive,
         TaskDialog,
         SubTaskCurrent,
+        SubTaskEdit,
     },
     props: {
         dataToModal: Boolean,
